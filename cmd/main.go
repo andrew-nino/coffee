@@ -3,13 +3,17 @@ package main
 import (
 	"coffee-app"
 	"coffee-app/pkg/handler"
+	"coffee-app/pkg/repository"
+	"coffee-app/pkg/service"
 	"log"
 )
 
 func main() {
 
-	handlers := new(handler.Handler)
-
+	repos := repository.NewRepository()
+	services := service.NewService(repos)
+	handlers := handler.NewHandler(services)
+	
 	srv := new(coffee.Server)
 
 	if err := srv.Run("8080", handlers.InitRoutes()); err != nil {
