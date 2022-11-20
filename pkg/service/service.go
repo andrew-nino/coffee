@@ -1,8 +1,12 @@
 package service
 
-import "coffee-app/pkg/repository"
+import (
+	"coffee-app"
+	"coffee-app/pkg/repository"
+)
 
-type Authorisation interface {
+type Authorization interface {
+	CreateUser(user coffee.User) (int, error)
 }
 
 type CoffeeList interface {
@@ -12,12 +16,14 @@ type CoffeeItem interface {
 }
 
 type Service struct {
-	Authorisation
+	Authorization
 	CoffeeList
 	CoffeeItem
 }
 
 func NewService(repos *repository.Repository) *Service {
 
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthservice(repos.Authorization),
+	}
 }

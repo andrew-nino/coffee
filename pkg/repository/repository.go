@@ -1,8 +1,13 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"coffee-app"
 
-type Authorisation interface {
+	"github.com/jmoiron/sqlx"
+)
+
+type Authorization interface {
+	CreateUser(user coffee.User) (int, error)
 }
 
 type CoffeeList interface {
@@ -12,12 +17,14 @@ type CoffeeItem interface {
 }
 
 type Repository struct {
-	Authorisation
+	Authorization
 	CoffeeList
 	CoffeeItem
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 
-	return &Repository{}
+	return &Repository{
+		Authorization: NewAuthPostgres(db),
+	}
 }

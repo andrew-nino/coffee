@@ -1,26 +1,29 @@
 package main
 
 import (
-	_ "github.com/lib/pq"
 	"coffee-app"
 	"coffee-app/pkg/handler"
 	"coffee-app/pkg/repository"
 	"coffee-app/pkg/service"
-	"log"
 	"os"
+
+	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
 func main() {
+	
+	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	if err := initConfig(); err != nil {
-		log.Fatalf("error initializing configs: %s", err.Error())
+		logrus.Fatalf("error initializing configs: %s", err.Error())
 	}
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error loading env variables: %s", err.Error())
+		logrus.Fatalf("error loading env variables: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
@@ -33,7 +36,7 @@ func main() {
 		Password: os.Getenv("DB_PASSWORD"),
 	})
 	if err != nil {
-		log.Fatalf("failed to initialize db: %s", err.Error())
+		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
 	repos := repository.NewRepository(db)
@@ -43,7 +46,7 @@ func main() {
 	srv := new(coffee.Server)
 
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		log.Fatalf("error occured while running http server : %s", err.Error())
+		logrus.Fatalf("error occured while running http server : %s", err.Error())
 	}
 }
 
