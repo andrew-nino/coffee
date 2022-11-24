@@ -8,6 +8,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user coffee.User) (int, error)
+	GetUser(username, password string) (coffee.User, error)
 }
 
 type CoffeeList interface {
