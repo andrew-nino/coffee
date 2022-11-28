@@ -43,6 +43,10 @@ func main() {
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
+
+	MyParsing(db)
+
+
 	srv := new(coffee.Server)
 
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {

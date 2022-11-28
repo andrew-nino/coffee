@@ -31,7 +31,48 @@ CREATE TABLE coffee_items
 
 CREATE TABLE lists_items
 (
-    id      serial                                           not null unique,
+    id      serial                                            not null unique,
     item_id int references coffee_items(id) on delete cascade not null,
     list_id int references coffee_lists(id) on delete cascade not null
+);
+
+CREATE TABLE client
+(
+    guid              varchar(255) not null unique,
+    key_authorization varchar(255) not null unique,
+    accaunt_name      varchar(255) not null unique
+);
+
+CREATE TABLE categories
+(
+    id   serial       not null unique,
+    guid varchar(255) not null unique,
+    name varchar(255) not null unique
+);
+
+CREATE TABLE sub_categories
+(
+    id   serial       not null unique,
+    parent_guid varchar(255) references categories (guid) not null,
+    guid        varchar(255)                              not null unique,
+    name        varchar(255)                              not null unique
+);
+
+CREATE TABLE items
+(
+    id           serial                                        not null unique,
+    cat_guid     varchar(255) references categories (guid)     not null,
+    guid         varchar(255)                                  not null unique,
+    name         varchar(255)                                  not null unique,
+    description  varchar(255)
+);
+
+CREATE TABLE types
+(
+    id          serial                               not null unique,
+    parent_guid varchar(255) references items (guid) not null,
+    guid        varchar(255)                         not null unique,
+    name        varchar(255),
+    price       int,
+    type_pic    varchar(255)
 );
