@@ -79,7 +79,7 @@ func MyParsing(tx *sqlx.DB) {
 	for _, rows := range newStruct.Rows {
 
 		// fmt.Println(rows.Guid)
-		// fmt.Println(rows.Name)
+		fmt.Println(rows.Name)
 
 		createQuery := fmt.Sprintf("INSERT INTO %s (guid, name) VALUES ($1, $2)", repository.Categories)
 		_, err := tx.Exec(createQuery, rows.Guid, rows.Name)
@@ -102,8 +102,8 @@ func MyParsing(tx *sqlx.DB) {
 				// fmt.Println(items.Name)
 				// fmt.Println(items.Price)
 				// fmt.Println(items.Desckription)
-				createQuery := fmt.Sprintf("INSERT INTO %s (cat_guid, guid, name, description) VALUES ($1, $2, $3, $4)", repository.Items)
-				_, err := tx.Exec(createQuery, rows.Guid, items.Guid, items.Name, items.Desckription)
+				createQuery := fmt.Sprintf("INSERT INTO %s (cat_guid, sub_cat_guid, guid, name, description) VALUES ($1, $2, $3, $4,$5)", repository.Items)
+				_, err := tx.Exec(createQuery, rows.Guid, categoryList.Guid, items.Guid, items.Name, items.Desckription)
 				check(err)
 
 				for _, typeList := range items.TypeLists {
@@ -134,7 +134,8 @@ func MyParsing(tx *sqlx.DB) {
 			// fmt.Println(categoryList.ComboList)
 		}
 		for _, itemsList := range rows.ItemLists {
-			// fmt.Println(itemsList.Guid)
+
+			fmt.Println(rows.Guid)
 			// fmt.Println(itemsList.Name)
 			// fmt.Println(itemsList.Price)
 			// fmt.Println(itemsList.Desckription)

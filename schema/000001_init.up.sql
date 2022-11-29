@@ -58,13 +58,23 @@ CREATE TABLE sub_categories
     name        varchar(255)                              not null unique
 );
 
+-- CREATE TABLE items_thimbnails
+-- (
+--     item_cat_guid     varchar(255) references categories (guid)     not null,
+--     item_sub_sub_guid varchar(255) references sub_categories (guid) not null,
+--     guid              varchar(255)                                  not null unique,
+--     type_pic          varchar(255)
+-- );
+
 CREATE TABLE items
 (
-    id           serial                                        not null unique,
-    cat_guid     varchar(255) references categories (guid)     not null,
-    guid         varchar(255)                                  not null unique,
-    name         varchar(255)                                  not null unique,
-    description  varchar(255)
+    id             serial        not null unique,
+    cat_guid       varchar(255)  not null,
+    sub_cat_guid   varchar(255)  default '',
+    guid           varchar(255)  not null unique,
+    name           varchar(255)  not null unique,
+    description    varchar(255),
+    thimbnails_pic varchar(255) default ''
 );
 
 CREATE TABLE types

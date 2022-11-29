@@ -44,7 +44,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 
-	MyParsing(db)
+	// MyParsing(db)
 
 
 	srv := new(coffee.Server)
