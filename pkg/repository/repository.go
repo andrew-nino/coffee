@@ -12,17 +12,23 @@ type Authorization interface {
 }
 
 type CoffeeList interface {
-	GetALLCategories() ([]coffee.Categories, error)
+	GetCategories(category string) ([]coffee.Category, error)
 }
 
 type CoffeeItem interface {
-	GetItemsById(cat string) ([]coffee.Items, error)
+	GetItemsById(cat string) ([]coffee.Item, error)
+	GetItems() ([]coffee.Item, error)
+}
+
+type CoffeeTypes interface {
+	GetTypes(item string) ([]coffee.Type, error)
 }
 
 type Repository struct {
 	Authorization
 	CoffeeList
 	CoffeeItem
+	CoffeeTypes
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -31,5 +37,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Authorization: NewAuthPostgres(db),
 		CoffeeList:    NewAllCategoriesPostgres(db),
 		CoffeeItem:    NewItemsostgres(db),
+		CoffeeTypes:   NewTypesostgres(db),
 	}
 }

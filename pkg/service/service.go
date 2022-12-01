@@ -12,17 +12,23 @@ type Authorization interface {
 }
 
 type CoffeeList interface {
-	GetALLCategories() ([]coffee.Categories, error)
+	GetCategories(category string) ([]coffee.Category, error)
 }
 
 type CoffeeItem interface {
-	GetItemsById(category string) ([]coffee.Items, error)
+	GetItemsById(category string) ([]coffee.Item, error)
+	GetItems() ([]coffee.Item, error)
+}
+
+type CoffeeTypes interface {
+	GetTypes(item string) ([]coffee.Type, error)
 }
 
 type Service struct {
 	Authorization
 	CoffeeList
 	CoffeeItem
+	CoffeeTypes
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -31,5 +37,6 @@ func NewService(repos *repository.Repository) *Service {
 		Authorization: NewAuthService(repos.Authorization),
 		CoffeeList:    NewAllCategoriesPostgres(repos.CoffeeList),
 		CoffeeItem:    NewItemsById(repos.CoffeeItem),
+		CoffeeTypes:   NewTypesService(repos.CoffeeTypes),
 	}
 }

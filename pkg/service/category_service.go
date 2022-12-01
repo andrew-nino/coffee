@@ -13,6 +13,6 @@ func NewAllCategoriesPostgres(repo repository.CoffeeList) *CategoriesService {
 	return &CategoriesService{repo: repo}
 }
 
-func (c *CategoriesService) GetALLCategories() ([]coffee.Categories, error) {
-	return c.repo.GetALLCategories()
+func (c *CategoriesService) GetCategories(category string) ([]coffee.Category, error) {
+	return c.repo.GetCategories(category)
 }

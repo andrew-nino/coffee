@@ -79,7 +79,7 @@ func MyParsing(tx *sqlx.DB) {
 	for _, rows := range newStruct.Rows {
 
 		// fmt.Println(rows.Guid)
-		fmt.Println(rows.Name)
+		// fmt.Println(rows.Name)
 
 		createQuery := fmt.Sprintf("INSERT INTO %s (guid, name) VALUES ($1, $2)", repository.Categories)
 		_, err := tx.Exec(createQuery, rows.Guid, rows.Name)
@@ -135,7 +135,7 @@ func MyParsing(tx *sqlx.DB) {
 		}
 		for _, itemsList := range rows.ItemLists {
 
-			fmt.Println(rows.Guid)
+			// fmt.Println(rows.Guid)
 			// fmt.Println(itemsList.Name)
 			// fmt.Println(itemsList.Price)
 			// fmt.Println(itemsList.Desckription)

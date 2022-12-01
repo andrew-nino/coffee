@@ -13,6 +13,9 @@ func NewItemsById(repo repository.CoffeeItem) *ItemsService {
 	return &ItemsService{repo: repo}
 }
 
-func (c *ItemsService) GetItemsById(categories string) ([]coffee.Items, error) {
+func (c *ItemsService) GetItemsById(categories string) ([]coffee.Item, error) {
 	return c.repo.GetItemsById(categories)
+}
+func (c *ItemsService) GetItems() ([]coffee.Item, error) {
+	return c.repo.GetItems()
 }

@@ -7,15 +7,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) createItem(c *gin.Context) {
-
-}
-
 type itemsById struct {
-	Data []coffee.Items `json:"data"`
+	Data []coffee.Item `json:"data"`
 }
 
 func (h *Handler) getAllItems(c *gin.Context) {
+
+	lists, err := h.services.CoffeeItem.GetItems()
+
+	if err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, itemsById{
+		Data: lists,
+	})
+}
+
+func (h *Handler) getItemFromCategory(c *gin.Context) {
 
 	category := c.Param("id")
 
@@ -29,16 +39,4 @@ func (h *Handler) getAllItems(c *gin.Context) {
 	c.JSON(http.StatusOK, itemsById{
 		Data: lists,
 	})
-}
-
-func (h *Handler) getItemById(c *gin.Context) {
-
-}
-
-func (h *Handler) updateItem(c *gin.Context) {
-
-}
-
-func (h *Handler) deleteItem(c *gin.Context) {
-
 }

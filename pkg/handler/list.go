@@ -16,12 +16,14 @@ func (h *Handler) createList(c *gin.Context) {
 }
 
 type getALLCategories struct {
-	Data []coffee.Categories `json:"data"`
+	Data []coffee.Category `json:"data"`
 }
 
-func (h *Handler) getAllLists(c *gin.Context) {
+func (h *Handler) getLists(c *gin.Context) {
 
-	lists, err := h.services.CoffeeList.GetALLCategories()
+	category, _ := c.GetQuery("class")
+
+	lists, err := h.services.CoffeeList.GetCategories(category)
 
 	if err != nil {
 		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -31,16 +33,4 @@ func (h *Handler) getAllLists(c *gin.Context) {
 	c.JSON(http.StatusOK, getALLCategories{
 		Data: lists,
 	})
-}
-
-func (h *Handler) getListById(c *gin.Context) {
-
-}
-
-func (h *Handler) updateList(c *gin.Context) {
-
-}
-
-func (h *Handler) deleteList(c *gin.Context) {
-
 }

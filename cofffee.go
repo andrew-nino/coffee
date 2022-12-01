@@ -25,33 +25,33 @@ type ListsItem struct {
 	ItemId int
 }
 
-type Categories struct {
+type Category struct {
 	Id   int    `json:"id,omitempty" db:"id,omitempty"`
-	Guid string `json:"guid,omitempty" db:"guid,omitempty"`
+	Guid string `json:"guidCategory,omitempty" db:"guid,omitempty"`
 	Name string `json:"name,omitempty" db:"name,omitempty"`
 }
 
-type SubCategories struct {
+type SubCategory struct {
 	Id         int    `json:"id,omitempty" db:"id,omitempty"`
 	ParentGuid string `json:"parent_guid,omitempty" db:"parent_guid,omitempty"`
-	Guid       string `json:"guid,omitempty" db:"guid,omitempty"`
+	Guid       string `json:"guidSubCategory,omitempty" db:"guid,omitempty"`
 	Name       string `json:"name,omitempty" db:"name,omitempty"`
 }
 
-type Items struct {
+type Item struct {
 	Id            int    `json:"id,omitempty" db:"id,omitempty"`
 	CatGuid       string `json:"cat_guid,omitempty" db:"cat_guid,omitempty"`
 	SubCatGuid    string `json:"sub_cat_guid,omitempty" db:"sub_cat_guid,omitempty"`
-	Guid          string `json:"guid,omitempty" db:"guid,omitempty"`
+	Guid          string `json:"guidItem,omitempty" db:"guid,omitempty"`
 	Name          string `json:"name,omitempty" db:"name,omitempty"`
 	Description   string `json:"description,omitempty" db:"description,omitempty"`
 	ThimbnailsPic string `json:"thimbnails_pic,omitempty" db:"thimbnails_pic,omitempty"`
 }
 
-type Types struct {
-	Id         int    `json:"id"`
-	ParentGuid string `json:"parent_guid" db:"parent_guid"`
-	Guid       string `json:"guid,omitempty" db:"guid,omitempty"`
+type Type struct {
+	Id         int    `json:"id,omitempty"`
+	ParentGuid string `json:"parent_guid,omitempty" db:"parent_guid,omitempty"`
+	Guid       string `json:"guidType,omitempty" db:"guid,omitempty"`
 	Name       string `json:"name,omitempty" db:"name,omitempty"`
 	Price      int    `json:"price,omitempty" db:"price,omitempty"`
 	TypePic    string `json:"type_pic,omitempty" db:"type_pic,omitempty"`
