@@ -19,7 +19,7 @@ func (c *TypesPostgres) GetTypes(item string) ([]coffee.Type, error) {
 
 	var allLists []coffee.Type
 
-	query := fmt.Sprintf("SELECT guid, name, price FROM %s WHERE parent_guid = $1", Types)
+	query := fmt.Sprintf("SELECT guid, name, price FROM %s WHERE parent_guid = $1", types)
 	err := c.db.Select(&allLists, query, item)
 
 	return allLists, err

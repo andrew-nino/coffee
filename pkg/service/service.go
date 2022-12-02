@@ -24,19 +24,25 @@ type CoffeeTypes interface {
 	GetTypes(item string) ([]coffee.Type, error)
 }
 
+type CoffeeDBUpdate interface {
+	UpdateDB() (string, error)
+}
+
 type Service struct {
 	Authorization
 	CoffeeList
 	CoffeeItem
 	CoffeeTypes
+	CoffeeDBUpdate
 }
 
 func NewService(repos *repository.Repository) *Service {
 
 	return &Service{
-		Authorization: NewAuthService(repos.Authorization),
-		CoffeeList:    NewAllCategoriesPostgres(repos.CoffeeList),
-		CoffeeItem:    NewItemsById(repos.CoffeeItem),
-		CoffeeTypes:   NewTypesService(repos.CoffeeTypes),
+		Authorization:  NewAuthService(repos.Authorization),
+		CoffeeList:     NewAllCategoriesPostgres(repos.CoffeeList),
+		CoffeeItem:     NewItemsById(repos.CoffeeItem),
+		CoffeeTypes:    NewTypesService(repos.CoffeeTypes),
+		CoffeeDBUpdate: NewUpdateService(repos.CoffeeDBUpdate),
 	}
 }

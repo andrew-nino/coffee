@@ -18,7 +18,7 @@ func NewItemsostgres(db *sqlx.DB) *ItemsPostgres {
 func (c *ItemsPostgres) GetItems() ([]coffee.Item, error) {
 	var allLists []coffee.Item
 
-	query := fmt.Sprintf("SELECT guid, name, description FROM %s ", Items)
+	query := fmt.Sprintf("SELECT guid, name, description FROM %s ", items)
 	err := c.db.Select(&allLists, query)
 
 	return allLists, err
@@ -27,7 +27,7 @@ func (c *ItemsPostgres) GetItems() ([]coffee.Item, error) {
 func (c *ItemsPostgres) GetItemsById(categoty string) ([]coffee.Item, error) {
 	var allLists []coffee.Item
 
-	query := fmt.Sprintf("SELECT guid, name,description FROM %s WHERE (cat_guid = $1 AND sub_cat_guid = '') OR (sub_cat_guid = $1 AND cat_guid != $1)", Items)
+	query := fmt.Sprintf("SELECT guid, name,description FROM %s WHERE (cat_guid = $1 AND sub_cat_guid = '') OR (sub_cat_guid = $1 AND cat_guid != $1)", items)
 	err := c.db.Select(&allLists, query, categoty)
 
 	return allLists, err

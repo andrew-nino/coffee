@@ -40,6 +40,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			types.GET("/:id", h.getTypesFromItem)
 		}
+		
+		update := api.Group("/update-db")
+		{
+			update.PUT("/", h.updateDB)
+		}
 	}
 
 	return router

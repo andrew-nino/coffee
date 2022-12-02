@@ -23,10 +23,10 @@ func (c *AllCategoriesPostgres) GetCategories(category string) ([]coffee.Categor
 	var lists_root []coffee.Category
 	var lists_sub []coffee.Category
 
-	query := fmt.Sprintf("SELECT guid, name FROM %s", Categories)
+	query := fmt.Sprintf("SELECT guid, name FROM %s", categories)
 	err := c.db.Select(&lists_root, query)
 
-	query = fmt.Sprintf("SELECT guid, name FROM %s", Sub_categories)
+	query = fmt.Sprintf("SELECT guid, name FROM %s", sub_categories)
 	err = c.db.Select(&lists_sub, query)
 
 	if root == category {

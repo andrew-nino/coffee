@@ -24,19 +24,25 @@ type CoffeeTypes interface {
 	GetTypes(item string) ([]coffee.Type, error)
 }
 
+type CoffeeDBUpdate interface {
+	UpdateDB() (string, error)
+}
+
 type Repository struct {
 	Authorization
 	CoffeeList
 	CoffeeItem
 	CoffeeTypes
+	CoffeeDBUpdate
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 
 	return &Repository{
-		Authorization: NewAuthPostgres(db),
-		CoffeeList:    NewAllCategoriesPostgres(db),
-		CoffeeItem:    NewItemsostgres(db),
-		CoffeeTypes:   NewTypesostgres(db),
+		Authorization:  NewAuthPostgres(db),
+		CoffeeList:     NewAllCategoriesPostgres(db),
+		CoffeeItem:     NewItemsostgres(db),
+		CoffeeTypes:    NewTypesostgres(db),
+		CoffeeDBUpdate: NewUpdatePostgres(db),
 	}
 }

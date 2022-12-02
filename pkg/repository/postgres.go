@@ -12,10 +12,10 @@ const (
 	userListsTable   = "users_list"
 	coffeeItemsTable = "coffee_items"
 	listsItemsTable  = "lists_items"
-	Categories       = "categories"
-	Sub_categories   = "sub_categories"
-	Items            = "items"
-	Types            = "types"
+	categories       = "categories"
+	sub_categories   = "sub_categories"
+	items            = "items"
+	types            = "types"
 )
 
 type Config struct {

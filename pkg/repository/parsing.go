@@ -1,7 +1,6 @@
-package main
+package repository
 
 import (
-	"coffee-app/pkg/repository"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -64,9 +63,9 @@ func check(e error) {
 	}
 }
 
-func MyParsing(tx *sqlx.DB) {
+func parsingDB(tx *sqlx.DB) {
 
-	file, err := ioutil.ReadFile("response.json")
+	file, err := ioutil.ReadFile("/home/andrew/Work/Go/src/coffee/response.json")
 	check(err)
 
 	var newStruct YTime
@@ -74,45 +73,28 @@ func MyParsing(tx *sqlx.DB) {
 	err = json.Unmarshal(file, &newStruct)
 	check(err)
 
-	fmt.Println(newStruct.Count)
-
 	for _, rows := range newStruct.Rows {
 
-		// fmt.Println(rows.Guid)
-		// fmt.Println(rows.Name)
-
-		createQuery := fmt.Sprintf("INSERT INTO %s (guid, name) VALUES ($1, $2)", repository.Categories)
+		createQuery := fmt.Sprintf("INSERT INTO %s (guid, name) VALUES ($1, $2)", categories)
 		_, err := tx.Exec(createQuery, rows.Guid, rows.Name)
 		check(err)
 
 		for _, categoryList := range rows.CategoryList {
-			// fmt.Println(categoryList.Guid)
-			// fmt.Println(categoryList.Name)
-			createQuery := fmt.Sprintf("INSERT INTO %s (parent_guid, guid, name) VALUES ($1, $2, $3)", repository.Sub_categories)
+
+			createQuery := fmt.Sprintf("INSERT INTO %s (parent_guid, guid, name) VALUES ($1, $2, $3)", sub_categories)
 			_, err := tx.Exec(createQuery, rows.Guid, categoryList.Guid, categoryList.Name)
 			check(err)
 
-			// for _, intocategoryList := range categoryList.CategoryList {
-			// 	fmt.Println(intocategoryList.Guid)
-			// 	fmt.Println(intocategoryList.Name)
+			for _, item := range categoryList.ItemLists {
 
-			// }
-			for _, items := range categoryList.ItemLists {
-				// fmt.Println(items.Guid)
-				// fmt.Println(items.Name)
-				// fmt.Println(items.Price)
-				// fmt.Println(items.Desckription)
-				createQuery := fmt.Sprintf("INSERT INTO %s (cat_guid, sub_cat_guid, guid, name, description) VALUES ($1, $2, $3, $4,$5)", repository.Items)
-				_, err := tx.Exec(createQuery, rows.Guid, categoryList.Guid, items.Guid, items.Name, items.Desckription)
+				createQuery := fmt.Sprintf("INSERT INTO %s (cat_guid, sub_cat_guid, guid, name, description) VALUES ($1, $2, $3, $4,$5)", items)
+				_, err := tx.Exec(createQuery, rows.Guid, categoryList.Guid, item.Guid, item.Name, item.Desckription)
 				check(err)
 
-				for _, typeList := range items.TypeLists {
-					// fmt.Println(typeList.Guid)
-					// fmt.Println(typeList.Name)
-					// fmt.Println(typeList.Price)
-					// fmt.Println(typeList.IsTogo)
-					createQuery := fmt.Sprintf("INSERT INTO %s (parent_guid, guid, name, price) VALUES ($1, $2, $3, $4)", repository.Types)
-					_, err := tx.Exec(createQuery, items.Guid, typeList.Guid, typeList.Name, typeList.Price)
+				for _, typeList := range item.TypeLists {
+
+					createQuery := fmt.Sprintf("INSERT INTO %s (parent_guid, guid, name, price) VALUES ($1, $2, $3, $4)", types)
+					_, err := tx.Exec(createQuery, item.Guid, typeList.Guid, typeList.Name, typeList.Price)
 					check(err)
 				}
 				// for _, supplement := range items.SupplementCategoryToFreeCount {
@@ -125,30 +107,19 @@ func MyParsing(tx *sqlx.DB) {
 				// }
 			}
 			// for _, goodList := range categoryList.GoodsLists {
-			// 	fmt.Println(goodList.Guid)
-			// 	fmt.Println(goodList.Name)
-			// 	fmt.Println(goodList.Price)
-			// 	fmt.Println(goodList.Desckription)
 			// }
 
 			// fmt.Println(categoryList.ComboList)
 		}
 		for _, itemsList := range rows.ItemLists {
 
-			// fmt.Println(rows.Guid)
-			// fmt.Println(itemsList.Name)
-			// fmt.Println(itemsList.Price)
-			// fmt.Println(itemsList.Desckription)
-			createQuery := fmt.Sprintf("INSERT INTO %s (cat_guid, guid, name, description) VALUES ($1, $2, $3, $4)", repository.Items)
+			createQuery := fmt.Sprintf("INSERT INTO %s (cat_guid, guid, name, description) VALUES ($1, $2, $3, $4)", items)
 			_, err := tx.Exec(createQuery, rows.Guid, itemsList.Guid, itemsList.Name, itemsList.Desckription)
 			check(err)
 
 			for _, typeList := range itemsList.TypeLists {
-				// fmt.Println(typeList.Guid)
-				// fmt.Println(typeList.Name)
-				// fmt.Println(typeList.Price)
-				// fmt.Println(typeList.IsTogo)
-				createQuery := fmt.Sprintf("INSERT INTO %s (parent_guid, guid, name, price) VALUES ($1, $2, $3, $4)", repository.Types)
+
+				createQuery := fmt.Sprintf("INSERT INTO %s (parent_guid, guid, name, price) VALUES ($1, $2, $3, $4)", types)
 				_, err := tx.Exec(createQuery, itemsList.Guid, typeList.Guid, typeList.Name, typeList.Price)
 				check(err)
 			}
