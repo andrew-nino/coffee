@@ -65,7 +65,7 @@ func check(e error) {
 
 func parsingDB(tx *sqlx.DB) {
 
-	file, err := ioutil.ReadFile("/home/andrew/Work/Go/src/coffee/response.json")
+	file, err := ioutil.ReadFile("response.json")
 	check(err)
 
 	var newStruct YTime

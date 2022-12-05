@@ -6,11 +6,13 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 const (
 	authorizationHeader = "Authorization"
 	userCtx             = "userId"
+	sendersUUID         = "24481d34-7498-11ed-a1eb-0242ac120002"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
@@ -35,7 +37,24 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	c.Set(userCtx, userId)
 }
 
-func getUserId(c *gin.Context) (int, error){
+func (h *Handler) senderIdentity(c *gin.Context) {
+
+	header := c.GetHeader(authorizationHeader)
+	if header == "" {
+		NewErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
+		return
+	}
+
+	if headerParts := strings.Split(header, " "); headerParts[1] != sendersUUID {
+
+		if len(headerParts) != 2 {
+			logrus.Error("invalid auth header")
+			return
+		}
+	}
+}
+
+func getUserId(c *gin.Context) (int, error) {
 
 	id, ok := c.Get(userCtx)
 	if !ok {
