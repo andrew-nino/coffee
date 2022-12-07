@@ -34,7 +34,7 @@ func (c *ItemsPostgres) GetItemsById(categoty string) ([]coffee.Item, error) {
 
 		var allTypes []coffee.Type
 
-		query = fmt.Sprintf("SELECT name, price FROM %s WHERE parent_guid = $1", types)
+		query = fmt.Sprintf("SELECT name, price, type_pic FROM %s WHERE parent_guid = $1", types)
 		_ = c.db.Select(&allTypes, query, allItems[i].Guid)
 
 		allItems[i].Types = append(allItems[i].Types, allTypes...)
