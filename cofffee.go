@@ -46,6 +46,7 @@ type Item struct {
 	Name          string `json:"name,omitempty" db:"name,omitempty"`
 	Description   string `json:"description,omitempty" db:"description,omitempty"`
 	ThimbnailsPic string `json:"thimbnails_pic,omitempty" db:"thimbnails_pic,omitempty"`
+	Types         []Type `json:"types,omitempty" db:"types,omitempty"`
 }
 
 type Type struct {

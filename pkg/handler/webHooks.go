@@ -45,5 +45,5 @@ func (h *Handler) updateClient(c *gin.Context) {
 
 	fmt.Println(input)
 
-	c.JSON(http.StatusOK, "OK")
+	c.String(http.StatusOK, "OK")
 }
