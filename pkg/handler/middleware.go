@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	authorizationHeader = "Authorization"
-	userCtx             = "userId"
-	sendersUUID         = "24481d34-7498-11ed-a1eb-0242ac120002"
+	authorizationHeader   = "Authorization"
+	authorizationHeaderDB = "AuthorizationDB"
+	userCtx               = "userId"
+	sendersUUID           = "24481d34-7498-11ed-a1eb-0242ac120002"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
@@ -39,18 +40,22 @@ func (h *Handler) userIdentity(c *gin.Context) {
 
 func (h *Handler) senderIdentity(c *gin.Context) {
 
-	header := c.GetHeader(authorizationHeader)
+	header := c.GetHeader(authorizationHeaderDB)
 	if header == "" {
 		NewErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
 		return
 	}
 
-	if headerParts := strings.Split(header, " "); headerParts[1] != sendersUUID {
+	headerParts := strings.Split(header, " ")
 
-		if len(headerParts) != 2 {
-			logrus.Error("invalid auth header")
-			return
-		}
+	if len(headerParts) != 2 {
+		logrus.Error("invalid auth header update-db")
+		return
+	}
+
+	if headerParts[1] != sendersUUID {
+		logrus.Error("invalid auth UUID")
+		return
 	}
 }
 

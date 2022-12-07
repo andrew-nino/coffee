@@ -84,5 +84,5 @@ CREATE TABLE types
     guid        varchar(255)                         not null unique,
     name        varchar(255),
     price       int,
-    type_pic    varchar(255)
+    type_pic    varchar(255) default ''
 );
