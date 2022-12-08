@@ -45,11 +45,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			update.PUT("/", h.updateDB)
 		}
-		
-		images := api.Group("/images")
-		{
-			go images.GET("/:name", h.getImage)
-		}
+
+	}
+
+	images := router.Group("/images")
+	{
+		go images.GET("/:name", h.getImage)
 	}
 
 	router.POST("/client/update", h.updateClient)
