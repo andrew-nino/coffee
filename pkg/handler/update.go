@@ -20,7 +20,7 @@ func (h *Handler) updateDB(c *gin.Context) {
 	data, err := h.services.CoffeeDBUpdate.UpdateDB()
 
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 

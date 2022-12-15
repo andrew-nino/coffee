@@ -18,7 +18,7 @@ func (h *Handler) getTypesFromItem(c *gin.Context) {
 	lists, err := h.services.CoffeeTypes.GetTypes(item)
 
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 

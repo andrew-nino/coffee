@@ -32,13 +32,13 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 func (s *AuthService) CreateUser(user coffee.User) (int, error) {
 
-	user.Password = generatePasswordHash(user.Password)
+	user.Phone = generatePasswordHash(user.Phone)
 	return s.repo.CreateUser(user)
 }
 
-func (s *AuthService) GenerateToken(username, password string) (string, error) {
+func (s *AuthService) GenerateToken(phoneCode, phone string) (string, error) {
 
-	user, err := s.repo.GetUser(username, generatePasswordHash(password))
+	user, err := s.repo.GetUser(phoneCode, generatePasswordHash(phone))
 
 	if err != nil {
 		return "", err

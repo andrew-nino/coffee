@@ -1,10 +1,11 @@
-DROP TABLE lists_items;
-
-DROP TABLE users_lists;
-
-DROP TABLE coffee_lists;
-
 DROP TABLE users;
 
-DROP TABLE coffee_items;
+DROP TABLE types;
 
+DROP TABLE items;
+
+DROP TABLE sub_categories;
+
+DROP TABLE categories;
+
+DROP TABLE actions;

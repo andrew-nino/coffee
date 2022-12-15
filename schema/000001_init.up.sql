@@ -1,46 +1,14 @@
 CREATE TABLE users
 (
     id            serial       not null unique,
-    name          varchar(255) not null,
-    username      varchar(255) not null unique,
-    password_hash varchar(255) not null
-);
-
-CREATE TABLE coffee_lists
-(
-    id          serial       not null unique,
-    title       varchar(255) not null,
-    description varchar(255)
-);
-
-CREATE TABLE users_lists
-(
-    id      serial                                             not null unique,
-    user_id int references users (id)   on delete cascade      not null,
-    list_id int references coffee_lists (id) on delete cascade not null
-);
-
-CREATE TABLE coffee_items
-(
-    id          serial       not null unique,
-    title       varchar(255) not null,
-    description varchar(255),
-    done        boolean      not null default false
-);
-
-
-CREATE TABLE lists_items
-(
-    id      serial                                            not null unique,
-    item_id int references coffee_items(id) on delete cascade not null,
-    list_id int references coffee_lists(id) on delete cascade not null
-);
-
-CREATE TABLE client
-(
-    guid              varchar(255) not null unique,
-    key_authorization varchar(255) not null unique,
-    accaunt_name      varchar(255) not null unique
+    phone_code    varchar(10)  not null,
+    phone_hash    varchar(255) not null unique,
+    name          varchar(50),
+    surname       varchar(50),
+    email         varchar(50),
+    birthday      date,
+    value         int          default 0,
+    message_key   varchar(255) not null unique
 );
 
 CREATE TABLE categories
@@ -52,19 +20,11 @@ CREATE TABLE categories
 
 CREATE TABLE sub_categories
 (
-    id   serial       not null unique,
+    id          serial       not null unique,
     parent_guid varchar(255) references categories (guid) not null,
     guid        varchar(255)                              not null unique,
     name        varchar(255)                              not null unique
 );
-
--- CREATE TABLE items_thimbnails
--- (
---     item_cat_guid     varchar(255) references categories (guid)     not null,
---     item_sub_sub_guid varchar(255) references sub_categories (guid) not null,
---     guid              varchar(255)                                  not null unique,
---     type_pic          varchar(255)
--- );
 
 CREATE TABLE items
 (
@@ -73,8 +33,8 @@ CREATE TABLE items
     sub_cat_guid   varchar(255)  default '',
     guid           varchar(255)  not null unique,
     name           varchar(255)  not null unique,
-    description    varchar(255),
-    thimbnails_pic varchar(255) default ''
+    description    text,
+    thimbnails_pic varchar(255)  default ''
 );
 
 CREATE TABLE types
@@ -85,4 +45,15 @@ CREATE TABLE types
     name        varchar(255),
     price       int,
     type_pic    varchar(255) default ''
+);
+
+CREATE TABLE actions
+(
+    id                 serial        not null unique,
+    action_guid        varchar(255)  not null,
+    action_name        varchar(255)  not null,
+    action_start_date  date          not null default now(),
+    action_expiry_date date          not null,
+    action_picture     varchar(255)  default '',
+    description        varchar(255)  default ''
 );

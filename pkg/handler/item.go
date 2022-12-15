@@ -16,7 +16,7 @@ func (h *Handler) getAllItems(c *gin.Context) {
 	lists, err := h.services.CoffeeItem.GetItems()
 
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -32,7 +32,7 @@ func (h *Handler) getItemFromCategory(c *gin.Context) {
 	lists, err := h.services.CoffeeItem.GetItemsById(category)
 
 	if err != nil {
-		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
