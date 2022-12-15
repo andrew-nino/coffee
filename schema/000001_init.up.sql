@@ -8,7 +8,7 @@ CREATE TABLE users
     email         varchar(50),
     birthday      date,
     value         int          default 0,
-    message_key   varchar(255) not null unique
+    message_key   varchar(255) unique
 );
 
 CREATE TABLE categories
@@ -50,10 +50,10 @@ CREATE TABLE types
 CREATE TABLE actions
 (
     id                 serial        not null unique,
-    action_guid        varchar(255)  not null,
-    action_name        varchar(255)  not null,
-    action_start_date  date          not null default now(),
-    action_expiry_date date          not null,
-    action_picture     varchar(255)  default '',
+    guid        varchar(255)  not null,
+    name        varchar(255)  not null,
+    start_date  date          not null default now(),
+    expiry_date date          not null,
+    picture     varchar(255)  default '',
     description        varchar(255)  default ''
 );

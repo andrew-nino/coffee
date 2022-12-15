@@ -16,6 +16,7 @@ const (
 	sub_categories   = "sub_categories"
 	items            = "items"
 	types            = "types"
+	actions          = "actions"
 )
 
 type Config struct {

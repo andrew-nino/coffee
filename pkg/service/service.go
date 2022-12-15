@@ -24,6 +24,11 @@ type CoffeeTypes interface {
 	GetTypes(item string) ([]coffee.Type, error)
 }
 
+type CoffeeAction interface {
+	GetActions() ([]coffee.Action, error)
+	GetActionById(guid string) (coffee.Action, error)
+}
+
 type CoffeeDBUpdate interface {
 	UpdateDB() (string, error)
 }
@@ -34,6 +39,7 @@ type Service struct {
 	CoffeeItem
 	CoffeeTypes
 	CoffeeDBUpdate
+	CoffeeAction
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -44,5 +50,6 @@ func NewService(repos *repository.Repository) *Service {
 		CoffeeItem:     NewItemsById(repos.CoffeeItem),
 		CoffeeTypes:    NewTypesService(repos.CoffeeTypes),
 		CoffeeDBUpdate: NewUpdateService(repos.CoffeeDBUpdate),
+		CoffeeAction:   NewActionServise(repos.CoffeeAction),
 	}
 }

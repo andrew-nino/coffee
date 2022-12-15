@@ -24,6 +24,11 @@ type CoffeeTypes interface {
 	GetTypes(item string) ([]coffee.Type, error)
 }
 
+type CoffeeAction interface {
+	GetActions() ([]coffee.Action, error)
+	GetActionById(guid string) (coffee.Action, error)
+}
+
 type CoffeeDBUpdate interface {
 	UpdateDB() (string, error)
 }
@@ -34,6 +39,7 @@ type Repository struct {
 	CoffeeItem
 	CoffeeTypes
 	CoffeeDBUpdate
+	CoffeeAction
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -44,5 +50,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		CoffeeItem:     NewItemsostgres(db),
 		CoffeeTypes:    NewTypesostgres(db),
 		CoffeeDBUpdate: NewUpdatePostgres(db),
+		CoffeeAction:   NewActionPostgres(db),
 	}
 }

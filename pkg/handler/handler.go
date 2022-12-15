@@ -41,11 +41,16 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			types.GET("/:id", h.getTypesFromItem)
 		}
 
+		actions := api.Group("/actions")
+		{
+			actions.GET("/", h.getAllActions)
+			actions.GET("/:id", h.getActionByID)
+		}
+
 		update := api.Group("/update-db", h.senderIdentity)
 		{
 			update.PUT("/", h.updateDB)
 		}
-
 	}
 
 	images := router.Group("/images")
