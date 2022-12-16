@@ -47,3 +47,8 @@ func (h *Handler) updateClient(c *gin.Context) {
 
 	c.String(http.StatusOK, "OK")
 }
+
+func (h *Handler) updateMenu(c *gin.Context) {
+
+	c.String(http.StatusOK, "OK")
+}

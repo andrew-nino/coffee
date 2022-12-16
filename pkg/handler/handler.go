@@ -60,5 +60,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.POST("/client/update", h.updateClient)
 
+	router.POST("/menu/changed", h.updateMenu)
+
 	return router
 }

@@ -1,7 +1,10 @@
 package handler
 
 import (
+	// "bytes"
 	"coffee-app"
+	// "encoding/json"
+	// "fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +47,38 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
+	// reqjson, _ := json.Marshal(input)
+	// fmt.Println(reqjson)
+	// req, err := http.NewRequest(
+	// 	"POST", "https://api.ytimes.ru/ex/client/loadClientInfo", bytes.NewBuffer(reqjson))
+	// if err != nil {
+	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
+	// // добавляем заголовок
+	// req.Header.Add("Content-Type", "application/json")
+	// req.Header.Add(authorizationHeader, "f8946569-64a6-4772-b713-e9e001144576-1670230075741")
+
+	// // Отправив на сервер, получаем ответ
+	// client := &http.Client{}
+	// respons, err := client.Do(req)
+	// if err != nil {
+	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
+	// defer respons.Body.Close()
+
+	// decoder := json.NewDecoder(respons.Body)
+
+	// var inputNew sighInInput
+
+	// err = decoder.Decode(&inputNew)
+
+	// if err != nil {
+	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
+
 	token, err := h.services.Authorization.GenerateToken(input.PhoneCode, input.Phone)
 
 	if err != nil {
@@ -53,5 +88,6 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
+		// "data": inputNew,
 	})
 }
