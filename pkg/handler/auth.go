@@ -1,10 +1,10 @@
 package handler
 
 import (
-	// "bytes"
+	"bytes"
 	"coffee-app"
-	// "encoding/json"
-	// "fmt"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +33,7 @@ func (h *Handler) signUp(c *gin.Context) {
 }
 
 type sighInInput struct {
-	PhoneCode string `json:"phone_code" binding:"required" db:"phone_code"`
+	PhoneCode string `json:"phoneCode" binding:"required" db:"phone_code"`
 	Phone     string `json:"phone" binding:"required" db:"phone"`
 }
 
@@ -47,37 +47,55 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	// reqjson, _ := json.Marshal(input)
-	// fmt.Println(reqjson)
-	// req, err := http.NewRequest(
-	// 	"POST", "https://api.ytimes.ru/ex/client/loadClientInfo", bytes.NewBuffer(reqjson))
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
-	// // добавляем заголовок
-	// req.Header.Add("Content-Type", "application/json")
-	// req.Header.Add(authorizationHeader, "f8946569-64a6-4772-b713-e9e001144576-1670230075741")
+	reqjson, _ := json.Marshal(input)
 
-	// // Отправив на сервер, получаем ответ
-	// client := &http.Client{}
-	// respons, err := client.Do(req)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
-	// defer respons.Body.Close()
+	req, err := http.NewRequest(
+		"POST", "https://api.ytimes.ru/ex/client/loadClientInfo", bytes.NewBuffer(reqjson))
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add(authorizationHeader, "e06f5ed1-7c14-4cc9-84ae-044dfa14b746")
 
-	// decoder := json.NewDecoder(respons.Body)
+	client := &http.Client{}
+	respons, err := client.Do(req)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	defer respons.Body.Close()
 
-	// var inputNew sighInInput
+	responseBody, err := ioutil.ReadAll(respons.Body)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+	}
 
-	// err = decoder.Decode(&inputNew)
+	var inputNew struct {
+		Success bool `json:"success"`
+		Rows    []struct {
+			OrderPromoCount     float32 `json:"orderPromoCount"`
+			OrderPromoFreeCount float32 `json:"orderPromoFreeCount"`
+			Points              float32 `json:"points"`
+		} `json:"rows"`
+	}
 
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
+	err = json.Unmarshal(responseBody, &inputNew)
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var outDate float32
+
+	if len(inputNew.Rows) != 0 && inputNew.Success != false {
+
+		outDate, err = h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, inputNew.Rows[0].Points)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
 
 	token, err := h.services.Authorization.GenerateToken(input.PhoneCode, input.Phone)
 
@@ -87,7 +105,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
-		// "data": inputNew,
+		"token":  token,
+		"points": outDate,
 	})
 }

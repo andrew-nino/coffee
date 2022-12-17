@@ -31,6 +31,7 @@ type CoffeeAction interface {
 
 type CoffeeDBUpdate interface {
 	UpdateDB() (string, error)
+	UpdatePoints(phone string, points float32) (float32, error)
 }
 
 type Service struct {

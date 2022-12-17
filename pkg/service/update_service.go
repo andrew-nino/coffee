@@ -13,3 +13,10 @@ func NewUpdateService(repo repository.CoffeeDBUpdate) *UpdateService {
 func (u *UpdateService) UpdateDB() (string, error) {
 	return u.repo.UpdateDB()
 }
+
+func (u *UpdateService) UpdatePoints(phone string, points float32) (float32, error) {
+
+	phone = generatePasswordHash(phone)
+
+	return u.repo.UpdatePoints(phone, points)
+}

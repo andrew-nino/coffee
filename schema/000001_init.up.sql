@@ -7,7 +7,7 @@ CREATE TABLE users
     surname       varchar(50),
     email         varchar(50),
     birthday      date,
-    value         int          default 0,
+    value         float        default 0,
     message_key   varchar(255) unique
 );
 

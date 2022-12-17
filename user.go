@@ -2,7 +2,7 @@ package coffee
 
 type User struct {
 	Id         int    `json:"-" db:"id"`
-	PhoneCode  string `json:"phone_code" binding:"required" db:"phone_code"`
+	PhoneCode  string `json:"phoneCode" binding:"required" db:"phone_code"`
 	Phone      string `json:"phone" binding:"required" db:"phone"`
 	Name       string `json:"name" db:"name"`
 	Surname    string `json:"surname" db:"surname"`
