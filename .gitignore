@@ -1,4 +1,4 @@
 .env
 .database/
-./wait-for-postgres.sh
-./Makefile
+wait-for-postgres.sh
+Makefile
