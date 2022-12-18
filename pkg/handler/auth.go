@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,14 +50,17 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	reqjson, _ := json.Marshal(input)
 
+	URL := os.Getenv("URL")
+	GUID := os.Getenv("GUID")
+
 	req, err := http.NewRequest(
-		"POST", "https://api.ytimes.ru/ex/client/loadClientInfo", bytes.NewBuffer(reqjson))
+		"POST", URL, bytes.NewBuffer(reqjson))
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add(authorizationHeader, "e06f5ed1-7c14-4cc9-84ae-044dfa14b746")
+	req.Header.Add(authorizationHeader, GUID)
 
 	client := &http.Client{}
 	respons, err := client.Do(req)

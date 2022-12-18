@@ -27,7 +27,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		lists := api.Group("/lists")
 		{
-			lists.GET("/", h.getLists)
+			lists.GET("/", h.getAllCategories)
 		}
 
 		items := api.Group("/items")
@@ -58,6 +58,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		go images.GET("/:name", h.getImage)
 	}
 
+	//webhooks
 	router.POST("/client/update", h.updateClient)
 
 	router.POST("/menu/changed", h.updateMenu)
