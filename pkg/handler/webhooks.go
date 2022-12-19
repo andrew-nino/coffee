@@ -11,7 +11,7 @@ import (
 type clienFromYtimes struct {
 	EventId                    string  `json:"eventId,omitempty"`
 	DateTimeUTC                string  `json:"dateTimeUTC,omitempty"`
-	PphoneCode                 string  `json:"phoneCode,omitempty"`
+	PhoneCode                  string  `json:"phoneCode,omitempty"`
 	Phone                      string  `json:"phone,omitempty"`
 	Number                     int     `json:"number,omitempty"`
 	Name                       string  `json:"name,omitempty"`
