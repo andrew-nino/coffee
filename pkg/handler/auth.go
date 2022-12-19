@@ -11,14 +11,51 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type sighInInput struct {
+	PhoneCode string `json:"phoneCode" binding:"required" db:"phone_code"`
+	Phone     string `json:"phone" binding:"required" db:"phone"`
+}
+
+type countsAndPoints struct {
+	Success bool `json:"success"`
+	Rows    []struct {
+		OrderPromoCount     float32 `json:"orderPromoCount"`
+		OrderPromoFreeCount float32 `json:"orderPromoFreeCount"`
+		Points              float32 `json:"points"`
+	}
+}
+
 func (h *Handler) signUp(c *gin.Context) {
 
 	var input coffee.User
+	var pointsReceived countsAndPoints
 
 	if err := c.BindJSON(&input); err != nil {
 
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	var clientData = sighInInput{
+		PhoneCode: input.PhoneCode,
+		Phone:     input.Phone,
+	}
+
+	err := requestPointsInYTimes(clientData, &pointsReceived)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if len(pointsReceived.Rows) == 0 {
+
+		err := createClientAndAddPointsInYTimes(input)
+
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
 	id, err := h.services.Authorization.CreateUser(input)
@@ -33,72 +70,16 @@ func (h *Handler) signUp(c *gin.Context) {
 	})
 }
 
-type sighInInput struct {
-	PhoneCode string `json:"phoneCode" binding:"required" db:"phone_code"`
-	Phone     string `json:"phone" binding:"required" db:"phone"`
-}
-
 func (h *Handler) signIn(c *gin.Context) {
 
 	var input sighInInput
+	var pointsReceived countsAndPoints
+	var points float32
 
 	if err := c.BindJSON(&input); err != nil {
 
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
-	}
-
-	reqjson, _ := json.Marshal(input)
-
-	URL := os.Getenv("URL")
-	GUID := os.Getenv("GUID")
-
-	req, err := http.NewRequest(
-		"POST", URL, bytes.NewBuffer(reqjson))
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add(authorizationHeader, GUID)
-
-	client := &http.Client{}
-	respons, err := client.Do(req)
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	defer respons.Body.Close()
-
-	responseBody, err := ioutil.ReadAll(respons.Body)
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-	}
-
-	var inputNew struct {
-		Success bool `json:"success"`
-		Rows    []struct {
-			OrderPromoCount     float32 `json:"orderPromoCount"`
-			OrderPromoFreeCount float32 `json:"orderPromoFreeCount"`
-			Points              float32 `json:"points"`
-		} `json:"rows"`
-	}
-
-	err = json.Unmarshal(responseBody, &inputNew)
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	var outDate float32
-
-	if len(inputNew.Rows) != 0 && inputNew.Success != false {
-
-		outDate, err = h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, inputNew.Rows[0].Points)
-		if err != nil {
-			newErrorResponse(c, http.StatusInternalServerError, err.Error())
-			return
-		}
 	}
 
 	token, err := h.services.Authorization.GenerateToken(input.PhoneCode, input.Phone)
@@ -108,8 +89,99 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
+	err = requestPointsInYTimes(input, &pointsReceived)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if len(pointsReceived.Rows) != 0 {
+
+		points, err = h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, pointsReceived.Rows[0].Points)
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token":  token,
-		"points": outDate,
+		"points": points,
 	})
+}
+
+func requestPointsInYTimes(input sighInInput, pointsReceived *countsAndPoints) error {
+
+	reqjson, _ := json.Marshal(input)
+
+	URL := os.Getenv("URL")
+	GUID := os.Getenv("GUID")
+
+	req, err := http.NewRequest(
+		"POST", URL+"/client/loadClientInfo", bytes.NewBuffer(reqjson))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add(authorizationHeader, GUID)
+
+	client := &http.Client{}
+	respons, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer respons.Body.Close()
+
+	responseBody, err := ioutil.ReadAll(respons.Body)
+	if err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal(responseBody, &pointsReceived); err != nil || pointsReceived.Success != true {
+		return err
+	}
+
+	return nil
+}
+
+func createClientAndAddPointsInYTimes(input coffee.User) error {
+
+	update := CliientUpdate{
+		RequestId: sendersUUID,
+		PhoneCode: input.PhoneCode,
+		Phone:     input.Phone,
+	}
+
+	reqjson, _ := json.Marshal(update)
+
+	URL := os.Getenv("URL")
+	GUID := os.Getenv("GUID")
+
+	req, err := http.NewRequest(
+		"POST", URL+"/client/createClientAndAddPoints", bytes.NewBuffer(reqjson))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add(authorizationHeader, GUID)
+
+	client := &http.Client{}
+	respons, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer respons.Body.Close()
+
+	responseBody, err := ioutil.ReadAll(respons.Body)
+	if err != nil {
+		return err
+	}
+
+	var counts_and_points countsAndPoints
+	if err = json.Unmarshal(responseBody, &counts_and_points); err != nil || counts_and_points.Success != true {
+		return err
+	}
+
+	return nil
 }

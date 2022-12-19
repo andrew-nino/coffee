@@ -6,6 +6,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type CliientUpdate struct {
+	RequestId             string  `json:"requestId"`
+	PhoneCode             string  `json:"phoneCode" binding:"required" db:"phone_code"`
+	Phone                 string  `json:"phone" binding:"required" db:"phone"`
+	Name                  string  `json:"name" db:"name"`
+	Surname               string  `json:"surname" db:"surname"`
+	Email                 string  `json:"email" db:"email""`
+	Birthday              string  `json:"birthday" db:"birthday"`
+	Sex                   string  `json:"sex" db:"sex"`
+	IsAgreeToNotification bool    `json:"isAgreeToNotification" db:"isAgreeToNotification"`
+	Comment               string  `json:"comment" db:"comment"`
+	Value                 float32 `json:"value" db:"value"`
+}
+
 var g_counter int
 
 func (h *Handler) updateDB(c *gin.Context) {
