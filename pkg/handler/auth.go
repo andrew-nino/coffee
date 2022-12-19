@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 
 	"github.com/gin-gonic/gin"
 )
@@ -147,8 +148,10 @@ func requestPointsInYTimes(input sighInInput, pointsReceived *countsAndPoints) e
 
 func createClientAndAddPointsInYTimes(input coffee.User) error {
 
+	newUUID, err := exec.Command("uuidgen",).Output()
+
 	update := CliientUpdate{
-		RequestId: sendersUUID,
+		RequestId: string(newUUID),
 		PhoneCode: input.PhoneCode,
 		Phone:     input.Phone,
 	}
