@@ -11,10 +11,33 @@ import (
 
 const (
 	authorizationHeader   = "Authorization"
+	longTimeToken         = "Long-time-token"
+	longTimeTokenPassword = "SuperPassword"
 	authorizationHeaderDB = "AuthorizationDB"
-	userCtx               = "userId"
+	userCtx               = "userPhone"
 	sendersUUID           = "24481d34-7498-11ed-a1eb-0242ac120002"
 )
+
+func (h *Handler) appIdentity(c *gin.Context) {
+
+	ltt := c.GetHeader(longTimeToken)
+
+	if ltt == "" {
+		newErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
+		return
+	}
+
+	password, err := h.services.Authorization.ParseToken(ltt)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if password != longTimeTokenPassword {
+		newErrorResponse(c, http.StatusUnauthorized, "password is not correct")
+		return
+	}
+}
 
 func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
@@ -29,13 +52,13 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		return
 	}
 
-	userId, err := h.services.Authorization.ParseToken(headerParts[1])
+	userPhone, err := h.services.Authorization.ParseToken(headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	c.Set(userCtx, userId)
+	c.Set(userCtx, userPhone)
 }
 
 func (h *Handler) senderIdentity(c *gin.Context) {

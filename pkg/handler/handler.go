@@ -17,13 +17,13 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	auth := router.Group("/auth")
+	auth := router.Group("/auth", h.appIdentity)
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
 	}
 
-	api := router.Group("/api", h.userIdentity)
+	api := router.Group("/api", h.appIdentity)
 	{
 		lists := api.Group("/lists")
 		{
@@ -44,24 +44,24 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		actions := api.Group("/actions")
 		{
 			actions.GET("/", h.getAllActions)
-			actions.GET("/:id", h.getActionByID)
+			actions.GET("/:id", h.userIdentity, h.getActionByID)
 		}
 
-		update := api.Group("/update-db", h.senderIdentity)
-		{
-			update.PUT("/", h.updateDB)
-		}
+		// update := api.Group("/update-db", h.senderIdentity)
+		// {
+		// 	update.PUT("/", h.updateDB)
+		// }
 	}
 
-	images := router.Group("/images")
+	images := router.Group("/images", h.appIdentity)
 	{
 		go images.GET("/:name", h.getImage)
 	}
 
 	//webhooks
-	router.POST("/client/update", h.updateClient)
+	// router.POST("/client/update", h.updateClient)
 
-	router.POST("/menu/changed", h.updateMenu)
+	// router.POST("/menu/changed", h.updateMenu)
 
 	return router
 }
