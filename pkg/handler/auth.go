@@ -116,30 +116,16 @@ func requestPointsInYTimes(input sighInInput, pointsReceived *countsAndPoints) e
 
 	reqjson, _ := json.Marshal(input)
 
-	URL := os.Getenv("URL")
+	URL := os.Getenv("URL") + "/client/loadClientInfo"
 	GUID := os.Getenv("GUID")
 
-	req, err := http.NewRequest(
-		"POST", URL+"/client/loadClientInfo", bytes.NewBuffer(reqjson))
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add(authorizationHeader, GUID)
+	responseBody, err := QueryInYTimes(URL, GUID, reqjson)
 
-	client := &http.Client{}
-	respons, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer respons.Body.Close()
-
-	responseBody, err := ioutil.ReadAll(respons.Body)
 	if err != nil {
 		return err
 	}
 
-	if err = json.Unmarshal(responseBody, &pointsReceived); err != nil || pointsReceived.Success != true {
+	if err := json.Unmarshal(responseBody, &pointsReceived); err != nil || pointsReceived.Success != true {
 		return err
 	}
 
@@ -148,7 +134,7 @@ func requestPointsInYTimes(input sighInInput, pointsReceived *countsAndPoints) e
 
 func createClientAndAddPointsInYTimes(input coffee.User) error {
 
-	newUUID, err := exec.Command("uuidgen",).Output()
+	newUUID, err := exec.Command("uuidgen").Output()
 
 	update := CliientUpdate{
 		RequestId: string(newUUID),
@@ -158,25 +144,11 @@ func createClientAndAddPointsInYTimes(input coffee.User) error {
 
 	reqjson, _ := json.Marshal(update)
 
-	URL := os.Getenv("URL")
+	URL := os.Getenv("URL") + "/client/createClientAndAddPoints"
 	GUID := os.Getenv("GUID")
 
-	req, err := http.NewRequest(
-		"POST", URL+"/client/createClientAndAddPoints", bytes.NewBuffer(reqjson))
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add(authorizationHeader, GUID)
+	responseBody, err := QueryInYTimes(URL, GUID, reqjson)
 
-	client := &http.Client{}
-	respons, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer respons.Body.Close()
-
-	responseBody, err := ioutil.ReadAll(respons.Body)
 	if err != nil {
 		return err
 	}
@@ -187,4 +159,29 @@ func createClientAndAddPointsInYTimes(input coffee.User) error {
 	}
 
 	return nil
+}
+
+func QueryInYTimes(url, guid string, reqjson []byte) ([]byte, error) {
+
+	req, err := http.NewRequest(
+		"POST", url, bytes.NewBuffer(reqjson))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add(authorizationHeader, guid)
+
+	client := &http.Client{}
+	respons, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer respons.Body.Close()
+
+	responseBody, err := ioutil.ReadAll(respons.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return responseBody, nil
 }

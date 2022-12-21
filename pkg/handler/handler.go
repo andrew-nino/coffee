@@ -59,7 +59,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 
 	//webhooks
-	// router.POST("/client/update", h.updateClient)
+	router.POST("/client/update", h.updateClient)
 
 	// router.POST("/menu/changed", h.updateMenu)
 
