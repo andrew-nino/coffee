@@ -13,8 +13,9 @@ import (
 )
 
 type sighInInput struct {
-	PhoneCode string `json:"phoneCode" binding:"required" db:"phone_code"`
-	Phone     string `json:"phone" binding:"required" db:"phone"`
+	PhoneCode  string `json:"phoneCode" binding:"required" db:"phone_code"`
+	Phone      string `json:"phone" binding:"required" db:"phone"`
+	MessageKey string `json:"message_key" db:"message_key"`
 }
 
 type countsAndPoints struct {
@@ -75,23 +76,32 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	var input sighInInput
 	var pointsReceived countsAndPoints
-	var points float32
+	var userData coffee.User
 
 	if err := c.BindJSON(&input); err != nil {
-
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	token, err := h.services.Authorization.GenerateToken(input.PhoneCode, input.Phone)
-
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	err = requestPointsInYTimes(input, &pointsReceived)
+	user := coffee.User {
+		PhoneCode: input.PhoneCode,
+		Phone: input.Phone,
+		MessageKey: input.MessageKey,
+	}
 
+	err = h.services.CoffeeDBUpdate.UpdateUser(user)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	
+	err = requestPointsInYTimes(input, &pointsReceived)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -99,7 +109,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	if len(pointsReceived.Rows) != 0 {
 
-		points, err = h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, pointsReceived.Rows[0].Points)
+		userData, err = h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, pointsReceived.Rows[0].Points)
 		if err != nil {
 			newErrorResponse(c, http.StatusInternalServerError, err.Error())
 			return
@@ -108,7 +118,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token":  token,
-		"points": points,
+		"points": userData.Value,
 	})
 }
 
@@ -140,6 +150,10 @@ func createClientAndAddPointsInYTimes(input coffee.User) error {
 		RequestId: string(newUUID),
 		PhoneCode: input.PhoneCode,
 		Phone:     input.Phone,
+		Name:      input.Name,
+		Surname:   input.Surname,
+		Email:     input.Email,
+		Birthday:  input.Birthday,
 	}
 
 	reqjson, _ := json.Marshal(update)

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"coffee-app"
 	"fmt"
 	"time"
 
@@ -22,16 +23,37 @@ func (u *UpdatePostgres) UpdateDB() (string, error) {
 	return time.Now().GoString(), nil
 }
 
-func (u *UpdatePostgres) UpdatePoints(phone string, points float32) (float32, error) {
+func (u *UpdatePostgres) UpdatePoints(phone string, points float32) (coffee.User, error) {
 
-	var outPoints float32
+	var user coffee.User
 
-	createQuery := fmt.Sprintf("UPDATE %s SET value =$1 WHERE phone_hash = $2 RETURNING value", userTable)
-	row := u.db.QueryRow(createQuery, points, phone)
+	createQuery := fmt.Sprintf("UPDATE %s SET value =$1 WHERE phone_hash = $2 RETURNING value, message_key", userTable)
+	err := u.db.Get(&user, createQuery, points, phone)
 
-	if err := row.Scan(&outPoints); err != nil {
-		return 0, err
+	return user, err
+}
+
+func (u *UpdatePostgres) UpdateUser(user coffee.User) error {
+
+	// if user.Name != ""
+	// if user.Surname != ""
+	// if user.Birthday != ""
+
+	var key string
+
+	createQuery := fmt.Sprintf("SELECT message_key FROM %s WHERE phone_hash = $1", userTable)
+	err := u.db.Get(&key, createQuery, user.Phone)
+	if err != nil {
+		return err
 	}
 
-	return outPoints, nil
+	if user.MessageKey != key {
+		createQuery := fmt.Sprintf("UPDATE %s SET message_key=$1 WHERE phone_hash = $2 ", userTable)
+		_, err := u.db.Exec(createQuery, user.MessageKey, user.Phone)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

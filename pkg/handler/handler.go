@@ -53,15 +53,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// }
 	}
 
-	images := router.Group("/images", h.appIdentity)
+	images := router.Group("/images")
 	{
 		go images.GET("/:name", h.getImage)
 	}
 
 	//webhooks
-	router.POST("/client/update", h.updateClient)
+	router.POST("/client/update", h.whClient)
 
-	// router.POST("/menu/changed", h.updateMenu)
+	// router.POST("/menu/changed", h.whMenu)
 
 	return router
 }

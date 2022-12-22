@@ -31,7 +31,8 @@ type CoffeeAction interface {
 
 type CoffeeDBUpdate interface {
 	UpdateDB() (string, error)
-	UpdatePoints(phone string, points float32) (float32, error)
+	UpdatePoints(phone string, points float32) (coffee.User, error)
+	UpdateUser(coffee.User) error
 }
 
 type Repository struct {

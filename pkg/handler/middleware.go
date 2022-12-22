@@ -14,7 +14,7 @@ const (
 	longTimeToken         = "Long-time-token"
 	longTimeTokenPassword = "SuperPassword"
 	authorizationHeaderDB = "AuthorizationDB"
-	userCtx               = "userPhone"
+	userCtx               = "userId"
 	sendersUUID           = "24481d34-7498-11ed-a1eb-0242ac120002"
 )
 
@@ -52,13 +52,13 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		return
 	}
 
-	userPhone, err := h.services.Authorization.ParseToken(headerParts[1])
+	userId, err := h.services.Authorization.ParseToken(headerParts[1])
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	c.Set(userCtx, userPhone)
+	c.Set(userCtx, userId)
 }
 
 func (h *Handler) senderIdentity(c *gin.Context) {

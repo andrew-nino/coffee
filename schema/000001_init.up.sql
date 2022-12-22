@@ -8,7 +8,7 @@ CREATE TABLE users
     email         varchar(50),
     birthday      date,
     value         float        default 0,
-    message_key   varchar(255) unique
+    message_key   varchar(255) not null default ''
 );
 
 CREATE TABLE categories

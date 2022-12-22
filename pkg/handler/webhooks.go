@@ -3,6 +3,8 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
+
 	"fmt"
 	"net/http"
 
@@ -51,7 +53,14 @@ type Data struct {
 	Amount      float32 `json:"amount"`
 }
 
-func (h *Handler) updateClient(c *gin.Context) {
+func (h *Handler) whClient(c *gin.Context) {
+
+	header := c.GetHeader(authorizationHeader)
+
+	if header != sendersUUID {
+		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+		return
+	}
 
 	var input clientFromYTimes
 
@@ -60,32 +69,34 @@ func (h *Handler) updateClient(c *gin.Context) {
 		logrus.Error("parsing error")
 		return
 	}
-	fmt.Println(input)
 	c.String(http.StatusOK, "OK")
-	
-	fmt.Println("Request on DB")
-	points, err := h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, float32(input.PointsChange))
+
+	userData, err := h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, float32(input.PointsValue))
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	fmt.Println("Answer from DB  Points = ", points)
+
+	fmt.Println("Answer from DB  Points = ", userData.Value)
+	fmt.Println("Answer from DB  MessageKey = ", userData.MessageKey)
 	fmt.Println("Request Push")
-	err = pushRequest(points)
+
+	err = pushRequest(userData.Value, userData.MessageKey)
 	if err != nil {
 		logrus.Error("pushRequest error")
 	}
 }
 
-func (h *Handler) updateMenu(c *gin.Context) {
+func (h *Handler) whMenu(c *gin.Context) {
 
 	c.String(http.StatusOK, "OK")
 }
 
-func pushRequest(points float32) error {
+func pushRequest(points float32, messageKey string) error {
 
 	newData := DataToSend{
-		MessageKey: "e1pTCS4vREWTP0syI8wQyf:APA91bF6KNwD6UzO7bKuTPU87nzEQY1aJjEaj41_bMUp7uovqHTJTSI1GXSnX23hTeGRToCkiRloQxn40IvGZf4slJNc_23Fgvn7-ptQcuFG2PDQDz33kPJIA_BMhDLz-XXSrAe2JOX7",
+
+		MessageKey: messageKey,
 		Notification: Notification{
 			Title: "hello",
 			Body:  "hello body",
@@ -104,6 +115,7 @@ func pushRequest(points float32) error {
 		return err
 	}
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add(authorizationHeader, "key=AAAAEgTcaiQ:APA91bEyrZpOVYoUD-lQRqxzS_zrzLn5WD-WQ3AtH-uvNNZQnF8ghT-_BaS0is5ptYS89vfAs9_34o2lr0I9abJ6dx3A7S2w1kKNQWJPzpR9c3o-4jg0ty0sxi3-0LlsDsYUqA_7yEQR")
 
 	client := &http.Client{}
 	respons, err := client.Do(req)
@@ -112,8 +124,16 @@ func pushRequest(points float32) error {
 	}
 	defer respons.Body.Close()
 
-	fmt.Println("PUSH Respons Status = ", respons.Status)
-	fmt.Println("PUSH Respons Body = ", respons.Body)
+	if respons.Status != "200 OK" {
+		responseBody, _ := ioutil.ReadAll(respons.Body)
+
+		var d map[string]interface{}
+
+		json.Unmarshal(responseBody, &d)
+
+		fmt.Println("PUSH Respons Status = ", respons.Status)
+		fmt.Println("PUSH Respons Body = ", d)
+	}
 
 	return nil
 }

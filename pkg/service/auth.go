@@ -49,7 +49,7 @@ func (s *AuthService) GenerateToken(phoneCode, phone string) (string, error) {
 			IssuedAt: time.Now().Unix(),
 		},
 
-		user.Phone,
+		string(rune(user.Id)),
 	})
 
 	return token.SignedString([]byte(signingtKey))
