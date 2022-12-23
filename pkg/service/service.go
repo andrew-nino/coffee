@@ -35,6 +35,10 @@ type CoffeeDBUpdate interface {
 	UpdateUser(coffee.User) error
 }
 
+type CoffeeClient interface {
+	GetBalance(id int) (float32, error)
+}
+
 type Service struct {
 	Authorization
 	CoffeeList
@@ -42,6 +46,7 @@ type Service struct {
 	CoffeeTypes
 	CoffeeDBUpdate
 	CoffeeAction
+	CoffeeClient
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -53,5 +58,6 @@ func NewService(repos *repository.Repository) *Service {
 		CoffeeTypes:    NewTypesService(repos.CoffeeTypes),
 		CoffeeDBUpdate: NewUpdateService(repos.CoffeeDBUpdate),
 		CoffeeAction:   NewActionServise(repos.CoffeeAction),
+		CoffeeClient:   NewClientServece(repos.CoffeeClient),
 	}
 }

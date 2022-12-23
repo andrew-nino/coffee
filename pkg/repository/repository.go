@@ -35,6 +35,10 @@ type CoffeeDBUpdate interface {
 	UpdateUser(coffee.User) error
 }
 
+type CoffeeClient interface {
+	GetBalance(id int) (float32, error)
+}
+
 type Repository struct {
 	Authorization
 	CoffeeList
@@ -42,6 +46,7 @@ type Repository struct {
 	CoffeeTypes
 	CoffeeDBUpdate
 	CoffeeAction
+	CoffeeClient
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -53,5 +58,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		CoffeeTypes:    NewTypesostgres(db),
 		CoffeeDBUpdate: NewUpdatePostgres(db),
 		CoffeeAction:   NewActionPostgres(db),
+		CoffeeClient:   NewClientPostgres(db),
 	}
 }

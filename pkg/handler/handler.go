@@ -47,10 +47,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			actions.GET("/:id", h.userIdentity, h.getActionByID)
 		}
 
-		// update := api.Group("/update-db", h.senderIdentity)
-		// {
-		// 	update.PUT("/", h.updateDB)
-		// }
+		ballance := api.Group("/balance", h.userIdentity)
+		{
+			ballance.GET("/", h.getBalance)
+		}
 	}
 
 	images := router.Group("/images")
@@ -62,6 +62,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.POST("/client/update", h.whClient)
 
 	// router.POST("/menu/changed", h.whMenu)
+
+	router.PUT("/update-db", h.senderIdentity)
 
 	return router
 }

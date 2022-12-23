@@ -50,8 +50,8 @@ type Notification struct {
 }
 
 type Data struct {
-	ClickAction string  `json:"click_action"`
-	Amount      int `json:"amount"`
+	ClickAction string `json:"click_action"`
+	Amount      int    `json:"amount"`
 }
 
 func (h *Handler) whClient(c *gin.Context) {
@@ -89,7 +89,7 @@ func (h *Handler) whClient(c *gin.Context) {
 		return
 	}
 
-	var outValue =  int(userData.Value)
+	var outValue = int(userData.Value)
 
 	err = pushRequest(outValue, userData.MessageKey)
 	if err != nil {
@@ -145,4 +145,45 @@ func pushRequest(points int, messageKey string) error {
 	}
 
 	return nil
+}
+
+var g_counter int
+
+func (h *Handler) updateDB(c *gin.Context) {
+
+	header := c.GetHeader(authorizationHeader)
+
+	if header == "" {
+		newErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
+		return
+	}
+
+	headerParts := strings.Split(header, " ")
+	if len(headerParts) != 2 {
+		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+		return
+	}
+
+	if headerParts[1] != sendersUUID {
+		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+		return
+	}
+
+	if g_counter >= 1 {
+		c.JSON(http.StatusMethodNotAllowed, map[string]interface{}{
+			"rejected": "The update has already been completed",
+		})
+		return
+	}
+
+	data, err := h.services.CoffeeDBUpdate.UpdateDB()
+
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, data)
+
+	g_counter++
 }

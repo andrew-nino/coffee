@@ -20,25 +20,24 @@ type CliientUpdate struct {
 	Value                 float32 `json:"value" db:"value"`
 }
 
-var g_counter int
+func (h *Handler) getBalance(c *gin.Context) {
 
-func (h *Handler) updateDB(c *gin.Context) {
-
-	if g_counter >= 1 {
-		c.JSON(http.StatusMethodNotAllowed, map[string]interface{}{
-			"rejected": "The update has already been completed",
-		})
+	id, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	data, err := h.services.CoffeeDBUpdate.UpdateDB()
+	balanceFloat, err := h.services.CoffeeClient.GetBalance(id)
 
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	var balanceInt = int(balanceFloat)
 
-	g_counter++
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"balance": balanceInt,
+	})
 }

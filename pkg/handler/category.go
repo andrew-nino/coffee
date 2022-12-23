@@ -21,12 +21,6 @@ type getALLCategories struct {
 
 func (h *Handler) getAllCategories(c *gin.Context) {
 
-	// _, err := getUserId(c)
-	// if err != nil {
-	// 	newErrorResponse(c, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-
 	category, _ := c.GetQuery("class")
 
 	categories, err := h.services.CoffeeList.GetCategories(category)

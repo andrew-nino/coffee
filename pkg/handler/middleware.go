@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -40,6 +41,7 @@ func (h *Handler) appIdentity(c *gin.Context) {
 }
 
 func (h *Handler) userIdentity(c *gin.Context) {
+
 	header := c.GetHeader(authorizationHeader)
 	if header == "" {
 		newErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
@@ -90,8 +92,8 @@ func getUserId(c *gin.Context) (int, error) {
 		return 0, errors.New("user is not found")
 	}
 
-	idInt, ok := id.(int)
-	if !ok {
+	idInt, err := strconv.Atoi(id.(string))
+	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "user id is invalid type")
 		return 0, errors.New("user id is invalid type")
 	}

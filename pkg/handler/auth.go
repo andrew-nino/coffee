@@ -89,9 +89,9 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	user := coffee.User {
-		PhoneCode: input.PhoneCode,
-		Phone: input.Phone,
+	user := coffee.User{
+		PhoneCode:  input.PhoneCode,
+		Phone:      input.Phone,
 		MessageKey: input.MessageKey,
 	}
 
@@ -100,7 +100,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	
+
 	err = requestPointsInYTimes(input, &pointsReceived)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -116,9 +116,11 @@ func (h *Handler) signIn(c *gin.Context) {
 		}
 	}
 
+	var outValue = int(userData.Value)
+
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token":  token,
-		"points": userData.Value,
+		"points": outValue,
 	})
 }
 
