@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"strings"
 
 	"fmt"
 	"net/http"
@@ -57,7 +58,18 @@ func (h *Handler) whClient(c *gin.Context) {
 
 	header := c.GetHeader(authorizationHeader)
 
-	if header != sendersUUID {
+	if header == "" {
+		newErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
+		return
+	}
+
+	headerParts := strings.Split(header, " ")
+	if len(headerParts) != 2 {
+		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+		return
+	}
+
+	if headerParts[1] != sendersUUID {
 		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
 		return
 	}
@@ -77,10 +89,6 @@ func (h *Handler) whClient(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Answer from DB  Points = ", userData.Value)
-	fmt.Println("Answer from DB  MessageKey = ", userData.MessageKey)
-	fmt.Println("Request Push")
-
 	err = pushRequest(userData.Value, userData.MessageKey)
 	if err != nil {
 		logrus.Error("pushRequest error")
@@ -95,11 +103,10 @@ func (h *Handler) whMenu(c *gin.Context) {
 func pushRequest(points float32, messageKey string) error {
 
 	newData := DataToSend{
-
 		MessageKey: messageKey,
 		Notification: Notification{
-			Title: "hello",
-			Body:  "hello body",
+			Title: "Спасибо за покупку!",
+			Body:  "Текущий баланс: " + fmt.Sprint(points),
 		},
 		Data: Data{
 			ClickAction: "FLUTTER_NOTIFICATION_CLICK",
