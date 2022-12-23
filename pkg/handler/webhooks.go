@@ -51,7 +51,7 @@ type Notification struct {
 
 type Data struct {
 	ClickAction string  `json:"click_action"`
-	Amount      float32 `json:"amount"`
+	Amount      int `json:"amount"`
 }
 
 func (h *Handler) whClient(c *gin.Context) {
@@ -89,7 +89,9 @@ func (h *Handler) whClient(c *gin.Context) {
 		return
 	}
 
-	err = pushRequest(userData.Value, userData.MessageKey)
+	var outValue =  int(userData.Value)
+
+	err = pushRequest(outValue, userData.MessageKey)
 	if err != nil {
 		logrus.Error("pushRequest error")
 	}
@@ -100,7 +102,7 @@ func (h *Handler) whMenu(c *gin.Context) {
 	c.String(http.StatusOK, "OK")
 }
 
-func pushRequest(points float32, messageKey string) error {
+func pushRequest(points int, messageKey string) error {
 
 	newData := DataToSend{
 		MessageKey: messageKey,

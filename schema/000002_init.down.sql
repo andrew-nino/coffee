@@ -1,0 +1,2 @@
+-- ALTER TABLE users ALTER COLUMN birthday TYPE date;
+-- ALTER TABLE users ALTER COLUMN birthday TYPE date USING (col_name::date);
