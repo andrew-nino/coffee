@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"fmt"
@@ -124,7 +125,7 @@ func pushRequest(points int, messageKey string) error {
 		return err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add(authorizationHeader, "key=AAAAEgTcaiQ:APA91bEyrZpOVYoUD-lQRqxzS_zrzLn5WD-WQ3AtH-uvNNZQnF8ghT-_BaS0is5ptYS89vfAs9_34o2lr0I9abJ6dx3A7S2w1kKNQWJPzpR9c3o-4jg0ty0sxi3-0LlsDsYUqA_7yEQR")
+	req.Header.Add(authorizationHeader, os.Getenv("FBASE_KEY"))
 
 	client := &http.Client{}
 	respons, err := client.Do(req)
