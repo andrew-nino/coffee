@@ -7,14 +7,12 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 const (
 	authorizationHeader   = "Authorization"
 	longTimeToken         = "Long-time-token"
 	longTimeTokenPassword = "SuperPassword"
-	authorizationHeaderDB = "AuthorizationDB"
 	userCtx               = "userId"
 	sendersUUID           = "24481d34-7498-11ed-a1eb-0242ac120002"
 )
@@ -65,21 +63,21 @@ func (h *Handler) userIdentity(c *gin.Context) {
 
 func (h *Handler) senderIdentity(c *gin.Context) {
 
-	header := c.GetHeader(authorizationHeaderDB)
+	header := c.GetHeader(authorizationHeader)
+
 	if header == "" {
 		newErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
 		return
 	}
 
 	headerParts := strings.Split(header, " ")
-
 	if len(headerParts) != 2 {
-		logrus.Error("invalid auth header update-db")
+		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
 		return
 	}
 
 	if headerParts[1] != sendersUUID {
-		logrus.Error("invalid auth UUID")
+		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
 		return
 	}
 }

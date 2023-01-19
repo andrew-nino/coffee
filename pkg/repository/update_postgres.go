@@ -3,6 +3,7 @@ package repository
 import (
 	"coffee-app"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -18,7 +19,42 @@ func NewUpdatePostgres(db *sqlx.DB) *UpdatePostgres {
 
 func (u *UpdatePostgres) UpdateDB() (string, error) {
 
-	parsingDB(u.db)
+	var mutex sync.Mutex
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	tx, err := u.db.Begin()
+	if err != nil {
+		return "", err
+	}
+
+	createQuery := fmt.Sprintf("DELETE FROM %s ", types)
+	_, err = u.db.Exec(createQuery)
+	if err != nil {
+		tx.Rollback()
+	}
+	createQuery = fmt.Sprintf("DELETE FROM %s ", items)
+	_, err = u.db.Exec(createQuery)
+	if err != nil {
+		tx.Rollback()
+	}
+	createQuery = fmt.Sprintf("DELETE FROM %s  ", sub_categories)
+	_, err = u.db.Exec(createQuery)
+	if err != nil {
+		tx.Rollback()
+	}
+	createQuery = fmt.Sprintf("DELETE FROM %s  ", categories)
+	_, err = u.db.Exec(createQuery)
+	if err != nil {
+		tx.Rollback()
+	}
+
+	tx.Commit()
+
+	if err := parsingDB(u.db); err != nil {
+		return "", err
+	}
 
 	return time.Now().GoString(), nil
 }

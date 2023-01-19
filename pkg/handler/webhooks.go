@@ -3,12 +3,10 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
-	"os"
-	"strings"
-
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -57,23 +55,7 @@ type Data struct {
 
 func (h *Handler) whClient(c *gin.Context) {
 
-	header := c.GetHeader(authorizationHeader)
-
-	if header == "" {
-		newErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
-		return
-	}
-
-	headerParts := strings.Split(header, " ")
-	if len(headerParts) != 2 {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
-		return
-	}
-
-	if headerParts[1] != sendersUUID {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
-		return
-	}
+	c.String(http.StatusOK, "OK")
 
 	var input clientFromYTimes
 
@@ -82,7 +64,6 @@ func (h *Handler) whClient(c *gin.Context) {
 		logrus.Error("parsing error")
 		return
 	}
-	c.String(http.StatusOK, "OK")
 
 	userData, err := h.services.CoffeeDBUpdate.UpdatePoints(input.Phone, float32(input.PointsValue))
 	if err != nil {
@@ -101,6 +82,25 @@ func (h *Handler) whClient(c *gin.Context) {
 func (h *Handler) whMenu(c *gin.Context) {
 
 	c.String(http.StatusOK, "OK")
+
+	responseBody, err := getMenu()
+
+	file, err := os.Create("response.json")
+	if err != nil {
+		logrus.Error("File create error")
+	}
+	defer file.Close()
+
+	fmt.Fprintf(file, "%s", responseBody)
+
+	data, err := h.services.CoffeeDBUpdate.UpdateDB()
+
+	if err != nil {
+		logrus.Error("Menu update error\n", err)
+		return
+	}
+
+	logrus.Println("Successful menu update at ", data)
 }
 
 func pushRequest(points int, messageKey string) error {
@@ -127,7 +127,6 @@ func pushRequest(points int, messageKey string) error {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add(authorizationHeader, os.Getenv("FBASE_KEY"))
 
-	client := &http.Client{}
 	respons, err := client.Do(req)
 	if err != nil {
 		return err
@@ -148,43 +147,30 @@ func pushRequest(points int, messageKey string) error {
 	return nil
 }
 
-var g_counter int
+func getMenu() ([]byte, error) {
 
-func (h *Handler) updateDB(c *gin.Context) {
+	SHOP_GUID := os.Getenv("SHOP_GUID")
+	URL := os.Getenv("URL") + "/menu/item/list?shopGuid=" + SHOP_GUID
+	GUID := os.Getenv("GUID")
 
-	header := c.GetHeader(authorizationHeader)
-
-	if header == "" {
-		newErrorResponse(c, http.StatusUnauthorized, "empty ayth header")
-		return
-	}
-
-	headerParts := strings.Split(header, " ")
-	if len(headerParts) != 2 {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
-		return
-	}
-
-	if headerParts[1] != sendersUUID {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
-		return
-	}
-
-	if g_counter >= 1 {
-		c.JSON(http.StatusMethodNotAllowed, map[string]interface{}{
-			"rejected": "The update has already been completed",
-		})
-		return
-	}
-
-	data, err := h.services.CoffeeDBUpdate.UpdateDB()
-
+	req, err := http.NewRequest(
+		"GET", URL, nil)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
+		return nil, err
 	}
 
-	c.JSON(http.StatusOK, data)
+	req.Header.Add(authorizationHeader, GUID)
 
-	g_counter++
+	respons, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer respons.Body.Close()
+
+	responseBody, err := ioutil.ReadAll(respons.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return responseBody, nil
 }

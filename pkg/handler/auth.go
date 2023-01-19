@@ -131,7 +131,7 @@ func requestPointsInYTimes(input sighInInput, pointsReceived *countsAndPoints) e
 	URL := os.Getenv("URL") + "/client/loadClientInfo"
 	GUID := os.Getenv("GUID")
 
-	responseBody, err := QueryInYTimes(URL, GUID, reqjson)
+	responseBody, err := queryInYTimes(URL, GUID, reqjson)
 
 	if err != nil {
 		return err
@@ -163,7 +163,7 @@ func createClientAndAddPointsInYTimes(input coffee.User) error {
 	URL := os.Getenv("URL") + "/client/createClientAndAddPoints"
 	GUID := os.Getenv("GUID")
 
-	responseBody, err := QueryInYTimes(URL, GUID, reqjson)
+	responseBody, err := queryInYTimes(URL, GUID, reqjson)
 
 	if err != nil {
 		return err
@@ -177,7 +177,7 @@ func createClientAndAddPointsInYTimes(input coffee.User) error {
 	return nil
 }
 
-func QueryInYTimes(url, guid string, reqjson []byte) ([]byte, error) {
+func queryInYTimes(url, guid string, reqjson []byte) ([]byte, error) {
 
 	req, err := http.NewRequest(
 		"POST", url, bytes.NewBuffer(reqjson))
@@ -187,7 +187,6 @@ func QueryInYTimes(url, guid string, reqjson []byte) ([]byte, error) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add(authorizationHeader, guid)
 
-	client := &http.Client{}
 	respons, err := client.Do(req)
 	if err != nil {
 		return nil, err

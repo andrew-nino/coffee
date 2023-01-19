@@ -2,9 +2,12 @@ package handler
 
 import (
 	"coffee-app/pkg/service"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
+
+var client = &http.Client{}
 
 type Handler struct {
 	services *service.Service
@@ -59,11 +62,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 
 	//webhooks
-	router.POST("/client/update", h.whClient)
+	router.POST("/client/update", h.senderIdentity, h.whClient)
 
-	// router.POST("/menu/changed", h.whMenu)
-
-	router.PUT("/update-db", h.senderIdentity)
+	router.POST("/menu/changed", h.senderIdentity, h.whMenu)
 
 	return router
 }
