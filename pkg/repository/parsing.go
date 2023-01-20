@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"coffee-app/assets"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -58,7 +59,7 @@ type GoodList struct {
 
 func parsingDB(db *sqlx.DB) error {
 
-	file, err := ioutil.ReadFile("response.json")
+	file, err := ioutil.ReadFile(assets.MENU)
 	if err != nil {
 		return err
 	}

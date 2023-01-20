@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"coffee-app/assets"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -85,7 +86,7 @@ func (h *Handler) whMenu(c *gin.Context) {
 
 	responseBody, err := getMenu()
 
-	file, err := os.Create("response.json")
+	file, err := os.Create(assets.MENU)
 	if err != nil {
 		logrus.Error("File create error")
 	}

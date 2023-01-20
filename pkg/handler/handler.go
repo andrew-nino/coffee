@@ -58,7 +58,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	images := router.Group("/images")
 	{
-		go images.GET("/:name", h.getImage)
+		images.GET("/:name", h.getImage)
 	}
 
 	//webhooks

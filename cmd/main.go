@@ -1,5 +1,3 @@
-// V1.2.0
-
 package main
 
 import (
@@ -19,6 +17,8 @@ import (
 func main() {
 	
 	logrus.SetFormatter(new(logrus.JSONFormatter))
+
+	logrus.Info("V1.2.1")
 
 	if err := initConfig(); err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())

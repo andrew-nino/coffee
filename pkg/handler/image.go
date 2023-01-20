@@ -1,10 +1,9 @@
 package handler
 
 import (
+	"coffee-app/assets"
 	"github.com/gin-gonic/gin"
 )
-
-const DIRECTORY = "image"
 
 func (h *Handler) getImage(c *gin.Context) {
 
@@ -12,5 +11,5 @@ func (h *Handler) getImage(c *gin.Context) {
 
 	c.Set("Content-Type", "image/jpeg")
 
-	c.File(DIRECTORY + "/" + nameImage)
+	c.File(assets.IMAGES + "/" + nameImage)
 }
